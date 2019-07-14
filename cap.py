@@ -75,7 +75,7 @@ def test(model):
         idx = subsample(index) 
         softmax = nn.Softmax(dim = 1)
         transform = transforms.Compose([
-                            transforms.RandomAffine(10), 
+                            transforms.RandomCrop((28 , 28)) ,
                             transforms.ToTensor() , 
                             transforms.Normalize((0.5,) , (0.5,)), 
                             ])
@@ -83,6 +83,10 @@ def test(model):
         dataloader = torch.utils.data.DataLoader(trainset, batch_size = 1 , sampler = idx)
         i = 0 
         for feat , label in dataloader :
+            plt.imshow(feat[0][0])
+            plt.show()
+            if input() != '' :
+                exit()
             output = model.forward(feat)
             output = softmax(output)
             k =  output.topk(1)[1].data
@@ -92,10 +96,11 @@ def test(model):
     exit()
 
 if __name__ ==  '__main__':
+
     z =  image_load()
     model = models.model2(batch_size = 1)
     model.load_state_dict(torch.load("optim_weights2.pth"))
-#    test(model)
+    test(model)
     feat = torch.tensor(z.get_segment()).float()
     softmax = nn.Softmax(dim = 1)
     number = []
@@ -103,9 +108,6 @@ if __name__ ==  '__main__':
         output = model.forward(i.view(1 ,1 , *i.shape))
         output = softmax(output)
         number.append(output.topk(1)[1].item())
-        '''
-        plt.imshow()
-        plt.show()
-        '''
+
     print ("NUMBER IS ")
     print (* number , sep = '')
