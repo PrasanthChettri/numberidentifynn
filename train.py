@@ -10,7 +10,7 @@ import pickle
 
 class train():
     def __init__(self):
-        self.model = models.model1()
+        self.model = models.model2()
         transform = transforms.Compose([
                         transforms.RandomCrop((28 , 28)) ,
                         transforms.ToTensor() , 

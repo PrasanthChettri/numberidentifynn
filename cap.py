@@ -4,6 +4,7 @@ import torch
 from torch import nn
 from matplotlib import pyplot as plt
 import  models 
+from sys import argv
 
 #IMPLEMENTING A SHITTY NUMBER SEGMENTER
 #TRYING TO MIMIC THE MNIST DATASET
@@ -15,9 +16,8 @@ class image_load:
         else :
             self.img = cv2.imread('canvas.jpg' ,cv2.IMREAD_GRAYSCALE)
         self.x = self.img.shape[-1]//3
-        self.y = 24
+        self.y = 20 
         self.img = cv2.resize(self.img  ,(self.x , self.y), interpolation = cv2.INTER_AREA)
-        print (self.img.shape)
 
     #SEGMENT THOSE NUMBERS BRO
     def get_segment(self , show = False):
@@ -55,8 +55,8 @@ class image_load:
         else : 
             mat = cv2.resize(mat , (self.y , 28) ,interpolation =  cv2.INTER_AREA)
         b = 28 - self.y
-        mat = np.concatenate((mat , np.zeros((b//2 , 28))) , axis = 0)
-        mat = np.concatenate((np.zeros((b - b//2  ,  28)) ,mat) , axis = 0)
+        mat = np.concatenate((mat , np.zeros(((b//2) - 2 , 28))) , axis = 0)
+        mat = np.concatenate((np.zeros(((b - b//2) + 2 ,  28)) ,mat) , axis = 0)
         return mat
 
     def show(self):
@@ -75,7 +75,7 @@ def test(model):
         idx = subsample(index) 
         softmax = nn.Softmax(dim = 1)
         transform = transforms.Compose([
-                            transforms.RandomCrop((28 , 28)) ,
+                            transforms.RandomCrop((28  , 28)) ,
                             transforms.ToTensor() , 
                             transforms.Normalize((0.5,) , (0.5,)), 
                             ])
@@ -83,10 +83,6 @@ def test(model):
         dataloader = torch.utils.data.DataLoader(trainset, batch_size = 1 , sampler = idx)
         i = 0 
         for feat , label in dataloader :
-            plt.imshow(feat[0][0])
-            plt.show()
-            if input() != '' :
-                exit()
             output = model.forward(feat)
             output = softmax(output)
             k =  output.topk(1)[1].data
@@ -96,18 +92,29 @@ def test(model):
     exit()
 
 if __name__ ==  '__main__':
-
     z =  image_load()
     model = models.model2(batch_size = 1)
-    model.load_state_dict(torch.load("optim_weights2.pth"))
-    test(model)
+    model.load_state_dict(torch.load("optim_weights.pth"))
+#    test(model)
     feat = torch.tensor(z.get_segment()).float()
     softmax = nn.Softmax(dim = 1)
-    number = []
+    number = ''
+    target_no = '1234567890'
     for i in feat :
+        if len(argv) - 1 :
+            plt.imshow(i)
+            plt.show()
         output = model.forward(i.view(1 ,1 , *i.shape))
         output = softmax(output)
-        number.append(output.topk(1)[1].item())
+        x = output.topk(1)[1].item()
+        number += str(x)
 
     print ("NUMBER IS ")
-    print (* number , sep = '')
+    print (number)
+    k = 0
+    for i , j in zip(number , target_no) :
+        if i == j:
+            k += 1
+    print ("Accuracy" , k)
+
+        
