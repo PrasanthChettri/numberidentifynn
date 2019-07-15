@@ -99,6 +99,7 @@ if __name__ ==  '__main__':
     feat = torch.tensor(z.get_segment()).float()
     softmax = nn.Softmax(dim = 1)
     number = ''
+    probab = 1
     target_no = '1234567890'
     for i in feat :
         if len(argv) - 1 :
@@ -107,7 +108,11 @@ if __name__ ==  '__main__':
         output = model.forward(i.view(1 ,1 , *i.shape))
         output = softmax(output)
         x = output.topk(1)[1].item()
+        y = output.topk(1)[0].item()
+        probab *= y
         number += str(x)
+
+
 
     print ("NUMBER IS ")
     print (number)
@@ -116,5 +121,4 @@ if __name__ ==  '__main__':
         if i == j:
             k += 1
     print ("Accuracy" , k)
-
-        
+    print ("probability " , probab)
