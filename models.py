@@ -45,6 +45,7 @@ class model2(nn.Module):
         self.relu = nn.ReLU()
         
     def forward(self,  x):
+        #Initialise  forward
         x = x.view(self.batch_size , -1)
 
         x = self.relu(self.lin1(x))
