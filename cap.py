@@ -6,9 +6,15 @@ from matplotlib import pyplot as plt
 import  models 
 from sys import argv
 
-#IMPLEMENTING A SHITTY NUMBER SEGMENTER
-#TRYING TO MIMIC THE MNIST DATASET
-
+'''
+    IMPLEMENTING A SHITTY NUMBER SEGMENTER
+    TRYING TO MIMIC THE MNIST DATASET
+    FUNCTIONAL SLIDING WINDOW SEGMENTORS CANNOT SEGMENT
+    DIGITS AT UNEVEN INTERVALS 
+    TWO CHOISES : 
+            1.TRAIN A NEURAL NET ->wrong way, too hard  
+            2.HACK TOGETHER SOMETHING -> right way, easy 
+'''
 class image_load:
     def __init__(self, img = None):
         if img :
@@ -90,8 +96,10 @@ def test(model):
                 i += 1
         print ((i/len(dataloader))*100 , "%")     
     exit()
+    def __str__(self):
+        return 'number segmentor'
 
-if __name__ ==  '__main__':
+def main():
     z =  image_load()
     model = models.model2(batch_size = 1)
     model.load_state_dict(torch.load("optim_weights.pth"))
@@ -122,3 +130,6 @@ if __name__ ==  '__main__':
             k += 1
     print ("Accuracy" , k)
     print ("probability " , probab)
+
+if __name__ ==  '__main__':
+    main()
