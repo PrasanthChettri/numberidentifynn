@@ -46,6 +46,8 @@ class model2(nn.Module):
         
     def forward(self,  x):
         #Initialise  forward
+        # FORWARD THROUGH DENSE NUERAL NETS FIRST
+        # THEN LSMTS 
         x = x.view(self.batch_size , -1)
 
         x = self.relu(self.lin1(x))
