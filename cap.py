@@ -3,17 +3,17 @@ import numpy as np
 import torch
 from torch import nn
 from matplotlib import pyplot as plt
-import  models 
+import  models
 from sys import argv
 
 '''
     IMPLEMENTING A SHITTY NUMBER SEGMENTER
     TRYING TO MIMIC THE MNIST DATASET
     FUNCTIONAL SLIDING WINDOW SEGMENTORS CANNOT SEGMENT
-    DIGITS AT UNEVEN INTERVALS 
-    TWO CHOISES : 
-            1.TRAIN A NEURAL NET ->wrong way, too hard  
-            2.HACK TOGETHER SOMETHING -> right way, easy 
+    DIGITS AT UNEVEN INTERVALS
+    TWO CHOISES :
+            1.TRAIN A NEURAL NET ->wrong way, too hard
+            2.HACK TOGETHER SOMETHING -> right way, easy
 '''
 class image_load:
     def __init__(self, img = None):
@@ -22,7 +22,7 @@ class image_load:
         else :
             self.img = cv2.imread('canvas.jpg' ,cv2.IMREAD_GRAYSCALE)
         self.x = self.img.shape[-1]//3
-        self.y = 20 
+        self.y = 20
         self.img = cv2.resize(self.img  ,(self.x , self.y), interpolation = cv2.INTER_AREA)
 
     #SEGMENT THOSE NUMBERS BRO
@@ -32,7 +32,7 @@ class image_load:
         temp = [refrence]
         prei = [None]
         for i in self.img.transpose() :
-            if (i == refrence).all(): 
+            if (i == refrence).all():
                 if len(temp) >  1:
                     temp = self.ref(temp)
                     digit_matrix.append(temp)
@@ -50,7 +50,7 @@ class image_load:
     #PROCESS THEM DATA BRO
     def ref(self , mat):
         mat = 255 -np.array(mat).transpose()
-        add_row = mat.shape[1] 
+        add_row = mat.shape[1]
         add_row = 28 - add_row
 #        print (np.zeros((28, 28 - add_row)))
 #        exit()
@@ -58,7 +58,7 @@ class image_load:
             a = int (add_row / 2)
             mat = np.concatenate((mat , np.zeros((self.y, a))) , axis = 1)
             mat = np.concatenate((np.zeros((self.y, add_row- a)) ,mat) , axis = 1)
-        else : 
+        else :
             mat = cv2.resize(mat , (self.y , 28) ,interpolation =  cv2.INTER_AREA)
         b = 28 - self.y
         mat = np.concatenate((mat , np.zeros(((b//2) - 2 , 28))) , axis = 0)
@@ -78,23 +78,23 @@ def test(model):
     with open("test_idx" , "rb") as f:
         index  = pickle.load(f)
     with torch.no_grad():
-        idx = subsample(index) 
+        idx = subsample(index)
         softmax = nn.Softmax(dim = 1)
         transform = transforms.Compose([
                             transforms.RandomCrop((28  , 28)) ,
-                            transforms.ToTensor() , 
-                            transforms.Normalize((0.5,) , (0.5,)), 
+                            transforms.ToTensor() ,
+                            transforms.Normalize((0.5,) , (0.5,)),
                             ])
         trainset = datasets.MNIST('MNIST_data/'  , train = True , transform = transform)
         dataloader = torch.utils.data.DataLoader(trainset, batch_size = 1 , sampler = idx)
-        i = 0 
+        i = 0
         for feat , label in dataloader :
             output = model.forward(feat)
             output = softmax(output)
             k =  output.topk(1)[1].data
             if k == label.data :
                 i += 1
-        print ((i/len(dataloader))*100 , "%")     
+        print ((i/len(dataloader))*100 , "%")
     exit()
     def __str__(self):
         return 'number segmentor'
@@ -121,8 +121,6 @@ def main():
         number += str(x)
 
 
-
-    print ("NUMBER IS ")
     print (number)
     k = 0
     for i , j in zip(number , target_no) :
